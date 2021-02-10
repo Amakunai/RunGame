@@ -6,15 +6,23 @@ public class PlayerMover : MonoBehaviour
 {
     public float speed = 5;
     public float maxSpeed;
+    public float HP;
+    public float MaxTime;
     public float jumpForce;
+    public float coolTime;
+    public float recastTimer;
+
 
     public bool isStart = false ;
     public bool isJump = false;
     public bool isGround = true;
     public bool isSliding = false;
+    public bool isDamage = false;
+    public bool isOver = false;
 
     private const int MAX_JUMP_COUNT = 2;
     private int jumpCount = 0;
+    private float MaxHP;
 
     private Rigidbody2D rb2d;
     private Animator anim;
@@ -30,22 +38,27 @@ public class PlayerMover : MonoBehaviour
         this.rb2d = GetComponent<Rigidbody2D>();
         this.anim = GetComponent<Animator>();
         this.caco = GetComponent<CapsuleCollider2D>();
+        MaxHP = HP;
     }
 
     // Update is called once per frame
     void Update()
     {
         SetKey();
+        SetDamage();
+        SetOver();
         SetAnim();
         SetSpeed();
     }
 
     private void SetAnim()
     {
+        anim.SetBool("isOver",isOver);
         anim.SetBool("isStart", isStart);
         anim.SetBool("isJump", isJump);
         anim.SetBool("isGround", isGround);
         anim.SetBool("isSliding",isSliding);
+        anim.SetBool("isDamage",isDamage);
     }
 
     private void SetKey() 
@@ -71,6 +84,39 @@ public class PlayerMover : MonoBehaviour
 
     }
 
+    private void SetDamage() 
+    {
+        if (isDamage) 
+        {
+            if (recastTimer > 0)
+            {
+                recastTimer -= Time.deltaTime / coolTime;
+            }
+            else 
+            {
+                isDamage = false;
+            }
+        }
+
+        if(isStart)
+            HP -= MaxHP * Time.deltaTime / MaxTime;
+    }
+
+    private void SetOver() 
+    {
+        if (HP < 0) 
+        {
+            HP = 0;
+        }
+        if (HP == 0) 
+        {
+            isOver = true;
+            isStart = false;
+        }
+    
+    
+    }
+
     private void SetSpeed() 
     {
         velx = rb2d.velocity.x;
@@ -84,14 +130,19 @@ public class PlayerMover : MonoBehaviour
     {
         if(isStart)
             Run();
+        if (!isStart)
+            rb2d.velocity = new Vector2(0,0);
 
-        if (isJump)
-            Jump();
+        if (isStart)
+        {
+            if (isJump)
+                Jump();
 
-        if (isSliding)
-            Sliding();
-        else
-            NonSliding();
+            if (isSliding)
+                Sliding();
+            else
+                NonSliding();
+        }
     }
 
     private void Run() 
@@ -129,10 +180,28 @@ public class PlayerMover : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name == "Ground")
+        if (collision.gameObject.tag == "Ground")
         {
             isGround = true;
             jumpCount = 0;
         }
+    }
+
+    private void OnTriggerStay2D(Collider2D col)//is Triggr on
+    {
+        if (!isDamage)
+        {
+            if (col.tag == "Block")
+            {
+                Damage();   
+            }
+        }
+    }
+
+    private void Damage() 
+    {
+        isDamage = true;
+        recastTimer = 1;
+        HP -= 30;
     }
 }

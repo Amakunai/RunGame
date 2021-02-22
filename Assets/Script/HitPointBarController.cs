@@ -5,12 +5,13 @@ using UnityEngine.UI;
 
 public class HitPointBarController : MonoBehaviour
 {
-    
-    public PlayerMover playerMover;
+
+    [SerializeField] private PlayerMover playerMover;
 
     private Image HPBar;
-    public float HP;
-    public float MaxHP;
+
+    [SerializeField] private float HP;
+    [SerializeField] private float MaxHP;
     // Start is called before the first frame update
     void Start()
     {

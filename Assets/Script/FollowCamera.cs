@@ -20,6 +20,6 @@ public class FollowCamera : MonoBehaviour
     void MoveCamera()
     {
         //横方向だけ追従
-        transform.position = new Vector3(playerTransform.position.x, transform.position.y, transform.position.z);
+        transform.position = new Vector3(playerTransform.position.x + 10, transform.position.y, transform.position.z);
     }
 }

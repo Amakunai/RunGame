@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class PlayerMover : MonoBehaviour
 {
-    public float speed = 5;
-    public float maxSpeed;
     public float HP;
-    public float MaxTime;
-    public float jumpForce;
-    public float coolTime;
-    public float recastTimer;
+    [SerializeField] private float speed = 5;
+    [SerializeField] private float maxSpeed;
+    [SerializeField] private float MaxTime;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float coolTime;//無敵時間
+    [SerializeField] private float recastTimer;//タイマー
 
 
-    public bool isStart = false ;
-    public bool isJump = false;
-    public bool isGround = true;
-    public bool isSliding = false;
-    public bool isDamage = false;
-    public bool isOver = false;
+    [SerializeField] private bool isStart = false ;
+    [SerializeField] private bool isJump = false;
+    [SerializeField] private bool isGround = true;
+    [SerializeField] private bool isSliding = false;
+    [SerializeField] private bool isDamage = false;
+    [SerializeField] private bool isOver = false;
 
     private const int MAX_JUMP_COUNT = 2;
     private int jumpCount = 0;
@@ -44,11 +44,17 @@ public class PlayerMover : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SetKey();
+        if(Time.timeScale != 0f)
+            SetKey();
         SetDamage();
         SetOver();
         SetAnim();
         SetSpeed();
+
+        if (HP > 100) 
+        {
+            HP = 100;
+        }
     }
 
     private void SetAnim()
